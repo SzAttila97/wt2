@@ -110,7 +110,20 @@ export class Customer extends React.Component {
                 orders: orders
             });
         });
+    };
 
+    onClickStatusDelted = (i) => {
+        const status = 'deleted';
+        let orders = [...this.state.orders];
+        orders[i].status = status;
+
+        axios.post('http://localhost/api/worker/orders/' + orders[i]._id + '/update-status', {
+            status: orders[i].status
+        }).then((response) => {
+            this.setState({
+                orders: orders
+            });
+        });
     };
 
     render() {
@@ -127,7 +140,7 @@ export class Customer extends React.Component {
                                 <th>Méretek</th>
                                 <th>Háló</th>
                                 <th>Szín</th>
-                                <th>Beszerelés</th>
+                                <th>Árajánlat</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -138,15 +151,47 @@ export class Customer extends React.Component {
                                         <td>{value.shutter ? value.shutter.width : ''} x {value.shutter ? value.shutter.height : ''}</td>
                                         <td>{value.shutterNet ? 'Igen' : 'Nem'}</td>
                                         <td>{value.shutterColor}</td>
-                                        <td>{value.installationDate}</td>
+                                        <td>{value.price}</td>
                                         <td>
-                                            <button className="btn btn-primary" onClick={() => this.onClickStatusOrdered(i)}>Véglegesítés</button>
+                                            {value.price ? <button className="btn btn-success" onClick={() => this.onClickStatusOrdered(i)}>Véglegesítés</button> : ''}
+                                        </td>
+                                        <td>
+                                            <button className="btn btn-danger" onClick={() => this.onClickStatusDelted(i)}>Törlés</button>
                                         </td>
                                     </tr>
                                 )
                             })}
                             </tbody>
                         </table>
+                        </div>
+                        <h2>Elkészült rendelések</h2>
+                        <div className="table-responsive">
+                            <table className="table table-condensed table-striped">
+                                <thead>
+                                <tr>
+                                    <th>Azonosító</th>
+                                    <th>Méretek</th>
+                                    <th>Háló</th>
+                                    <th>Szín</th>
+                                    <th>Beszerelés</th>
+                                    <th>Ár</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {this.state.orders.map((value, i) => {
+                                    if (value.status === "Finished" || value.status === 'Paid') return (
+                                        <tr key={i}>
+                                            <td>{value._id}</td>
+                                            <td>{value.shutter ? value.shutter.width : ''} x {value.shutter ? value.shutter.height : ''}</td>
+                                            <td>{value.shutterNet ? 'Igen' : 'Nem'}</td>
+                                            <td>{value.shutterColor}</td>
+                                            <td>{value.installationDate}</td>
+                                            <td>{value.price}</td>
+                                        </tr>
+                                    )
+                                })}
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                     <div className="col-md-6">

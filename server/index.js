@@ -57,6 +57,12 @@ app.post('/api/manager/orders/:id/update-installationDate', async (req, res) => 
     res.json({success: true});
 });
 
+// Rendelés dátum változtatása
+app.post('/api/manager/orders/:id/update-price', async (req, res) => {
+    await Order.update({_id: mongoose.Types.ObjectId(req.params.id)}, {$set: {price: req.body.price}});
+    res.json({success: true});
+});
+
 // Összes redőny lekérése
 app.get('/api/shutters', (req, res) => {
     Shutter.find({}, function(err, shutters) {

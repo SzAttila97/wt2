@@ -6,7 +6,8 @@ export class Manager extends React.Component {
         orders: [],
         shutters: [],
         formSelectedPreset: '',
-        formDate: ''
+        formDate: '',
+        formPrice: ''
     };
 
     componentDidMount() {
@@ -96,11 +97,34 @@ export class Manager extends React.Component {
 
     };
 
+    onPriceChange = (event) => {
+        this.setState({
+            formSelectedPreset: '',
+            formPrice: event.target.value
+        });
+    };
+
+    onClickStatusPrice = (i) => {
+        const price = this.state.formPrice;
+        let orders = [...this.state.orders];
+        orders[i].price = price;
+
+        axios.post('http://localhost/api/manager/orders/' + orders[i]._id + '/update-price', {
+            price: orders[i].price
+        }).then((response) => {
+            this.setState({
+                orders: orders
+            });
+        });
+
+    };
+
+
 
     render() {
         return (
             <div className="manager-wrapper">
-                <h2 className="p-3 mb-2 bg-danger">Leadott rendelések</h2>
+                <h2 className="p-3 mb-2 bg-danger">Tevékenyégek</h2>
                 <table className="table table-condensed table-striped">
                     <thead>
                     <tr>
@@ -109,6 +133,7 @@ export class Manager extends React.Component {
                         <th>Háló</th>
                         <th>Szín</th>
                         <th>Beszerelés</th>
+                        <th>Ár</th>
                         <th>Státusz</th>
                     </tr>
                     </thead>
@@ -121,7 +146,43 @@ export class Manager extends React.Component {
                                 <td>{value.shutterNet ? 'Igen' : 'Nem'}</td>
                                 <td>{value.shutterColor}</td>
                                 <td>{value.installationDate}</td>
+                                <td>{value.price}</td>
                                 <td>{value.status}</td>
+                            </tr>
+                        )
+                    })}
+                    </tbody>
+                </table>
+                <h2 className="p-3 mb-2 bg-danger">Függő rendelések</h2>
+                <table className="table table-condensed table-striped">
+                    <thead>
+                    <tr>
+                        <th>Azonosító</th>
+                        <th>Méretek</th>
+                        <th>Háló</th>
+                        <th>Szín</th>
+                        <th>Árajánlat</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {this.state.orders.map((value, i) => {
+                        if (value.status === "pending") return (
+                            <tr key={i}>
+                                <td>{value._id}</td>
+                                <td>{value.shutter ? value.shutter.width : ''} x {value.shutter ? value.shutter.height : ''}</td>
+                                <td>{value.shutterNet ? 'Igen' : 'Nem'}</td>
+                                <td>{value.shutterColor}</td>
+                                <td>{value.price}</td>
+                                <td>
+                                    <input onChange={this.onPriceChange} value={this.state.formPrice}
+                                           type="number"
+                                           className="form-control"/>
+                                </td>
+                                <td>
+                                    <button className="btn btn-warning"
+                                            onClick={() => this.onClickStatusPrice(i)}>Beáraz
+                                    </button>
+                                </td>
                             </tr>
                         )
                     })}
@@ -243,6 +304,7 @@ export class Manager extends React.Component {
                                 <th>Háló</th>
                                 <th>Szín</th>
                                 <th>Beszerelés</th>
+                                <th>Ár</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -254,6 +316,7 @@ export class Manager extends React.Component {
                                         <td>{value.shutterNet ? 'Igen' : 'Nem'}</td>
                                         <td>{value.shutterColor}</td>
                                         <td>{value.installationDate}</td>
+                                        <td>{value.price}</td>
                                         <td>
                                             {value.status !== 'Paid'
                                                 ?

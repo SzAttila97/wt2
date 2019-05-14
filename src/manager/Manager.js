@@ -153,7 +153,7 @@ export class Manager extends React.Component {
                     })}
                     </tbody>
                 </table>
-                <h2 className="p-3 mb-2 bg-danger">Függő rendelések</h2>
+                <h2 className="p-3 mb-2 bg-success">Függő rendelések</h2>
                 <table className="table table-condensed table-striped">
                     <thead>
                     <tr>
